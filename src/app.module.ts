@@ -3,6 +3,13 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+import { UsersModule } from './users/users.module';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
+import { AuthModule } from './auth/auth.module';
+import { CoinbaseService } from './coinbase/coinbase.service';
+import { CoinbaseController } from './coinbase/coinbase.controller';
+import { CoinbaseModule } from './coinbase/coinbase.module';
 
 @Module({
   imports: [
@@ -14,8 +21,11 @@ import { AppService } from "./app.service";
       }),
       inject: [ConfigService],
     }),
+    UsersModule,
+    AuthModule,
+    CoinbaseModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, AuthController, CoinbaseController],
+  providers: [AppService, AuthService, CoinbaseService],
 })
 export class AppModule {}
