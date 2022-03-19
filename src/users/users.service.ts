@@ -1,9 +1,14 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
-import { CreateUserRequest } from "./dto/create-user-request.dto";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from "@nestjs/common";
+import { CreateUserRequest } from "./dto/request/create-user-request.dto";
 import { UsersRepository } from "./users.repository";
-import { hash } from "bcrypt";
+import { hash, compare } from "bcrypt";
 import { User } from "./models/Users";
-import { UserReponse } from "./dto/request/user-response.dto";
+import { UserResponse } from "./dto/response/user-response.dto";
 
 @Injectable()
 export class UsersService {
@@ -15,9 +20,20 @@ export class UsersService {
       ...createUserRequest,
       password: await hash(createUserRequest.password, 10),
     });
-    return this.buildReponse(user);
+    return this.buildResponse(user);
   }
 
+  async validateUser(email: string, password: string): Promise<UserResponse> {
+    const user = await this.usersRepository.findOneByEmail(email);
+    if (!user) {
+      throw new NotFoundException(`User does not exist with email: ${email}`);
+    }
+    const validPassword = await compare(password, user.password);
+    if (!validPassword) {
+      throw new UnauthorizedException("Invalid Crednetials");
+    }
+    return this.buildResponse(user);
+  }
   private async validateCreateUserRequest(
     createUserRequest: CreateUserRequest
   ): Promise<void> {
@@ -28,7 +44,7 @@ export class UsersService {
       throw new BadRequestException("Email already exists");
     }
   }
-  private buildReponse(user: User): UserReponse {
+  private buildResponse(user: User): UserResponse {
     return { _id: user._id.toHexString(), name: user.name, email: user.email };
   }
 }
