@@ -13,4 +13,8 @@ export class UsersRepository {
     const user = new this.user(data);
     return user.save();
   }
+
+  async findOneByEmail(email: string): Promise<User> {
+    return this.user.findOne({ email });
+  }
 }
