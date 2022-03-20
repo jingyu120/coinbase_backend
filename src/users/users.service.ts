@@ -81,6 +81,7 @@ export class UsersService {
   private buildResponse(user: User): UserResponse {
     return {
       _id: user._id.toHexString(),
+      name: user.name,
       email: user.email,
       isCoinbaseAuthorized: !!user.coinbaseAuth,
     };
