@@ -1,4 +1,4 @@
-import { Prop } from "@nestjs/mongoose";
+import { Prop } from '@nestjs/mongoose';
 
 export class CoinbaseAuth {
   @Prop()

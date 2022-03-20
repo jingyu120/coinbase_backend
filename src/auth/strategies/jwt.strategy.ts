@@ -1,16 +1,17 @@
-import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { PassportStrategy } from "@nestjs/passport";
-import { Request } from "express";
-import { Strategy, ExtractJwt } from "passport-jwt";
-import { UserResponse } from "src/users/dto/response/user-response.dto";
-import { UsersService } from "src/users/users.service";
-import { TokenPayload } from "../auth.service";
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { PassportStrategy } from '@nestjs/passport';
+import { Request } from 'express';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { UserResponse } from '../../users/dto/response/user-response.dto';
+import { UsersService } from '../../users/users.service';
+import { TokenPayload } from '../auth.service';
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     configService: ConfigService,
-    private readonly userService: UsersService
+    private readonly usersService: UsersService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -18,11 +19,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
           return request?.cookies?.Authentication;
         },
       ]),
-      secretOrKey: configService.get("JWT_SECRET"),
+      secretOrKey: configService.get('JWT_SECRET'),
     });
   }
 
   async validate(payload: TokenPayload): Promise<UserResponse> {
-    return this.userService.getUserById(payload.userId);
+    return this.usersService.getUserById(payload.userId);
   }
 }
